@@ -20,27 +20,39 @@ def home():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     file = request.files['file']
-    
-    # Use row 5 as header
+
+    # ✅ Row 5 is header
     df = pd.read_excel(file, header=4)
 
-    # Remove columns
-    df = df.drop(columns=["   Department Name   ", "   Convertion Name   ","   Scale 1   ","   Operator   ","   Scale 2   ","   Low Stock   "], errors='ignore')
+    # ✅ Drop completely empty columns (important for messy Excel)
+    df = df.dropna(axis=1, how='all')
+
+    # Debug safety (prevents crash if structure changes)
+    print(df.columns)
+
+    # Remove columns by NAME (NOT index)
+    # Based on your sample file:
+    remove_cols = [
+        "Scale 1",
+        "Scale 2",
+        "Department Name",
+        "Convertion Name",
+        "Operator",
+        "Low Stock"
+    ]
+
+    df = df.drop(columns=remove_cols, errors='ignore')
 
     # Add new columns
     df["benar"] = ""
     df["real value"] = ""
 
-    # Save to memory (important for deployment)
+
     output = BytesIO()
     df.to_excel(output, index=False)
     output.seek(0)
 
-    return send_file(
-        output,
-        download_name="output.xlsx",
-        as_attachment=True
-    )
+    return send_file(output, download_name="output.xlsx", as_attachment=True)
 
 # ✅ Required for Render (port handling)
 if __name__ == "__main__":
