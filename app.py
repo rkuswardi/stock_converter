@@ -44,7 +44,6 @@ def upload_file():
         # Based on your sample file:
         remove_cols = [
             "Scale 1",
-            "Scale 2",
             "Department Name",
             "Convertion Name",
             "Operator",
