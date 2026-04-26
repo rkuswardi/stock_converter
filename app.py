@@ -24,8 +24,15 @@ def upload_file():
 
     # ✅ Row 5 is header
     df = pd.read_excel(file, header=4)
+    
+    df.columns = (
+        df.columns
+        .astype(str)
+        .str.replace("\n", " ")
+        .str.strip()
+    )
 
-    df.columns = df.columns.str.strip()
+    print("🔥 RAW COLUMNS:", list(df.columns))
 
     # ✅ Drop completely empty columns (important for messy Excel)
     df = df.dropna(axis=1, how='all')
@@ -44,7 +51,11 @@ def upload_file():
         "Low Stock"
     ]
 
+    print("🧨 TRYING TO REMOVE:", remove_cols)
+
     df = df.drop(columns=remove_cols, errors='ignore')
+
+
 
     # Add new columns
     df["benar"] = ""
@@ -55,6 +66,7 @@ def upload_file():
     df.to_excel(output, index=False)
     output.seek(0)
 
+
     return send_file(output, download_name="output.xlsx", as_attachment=True)
 
 
@@ -63,4 +75,8 @@ def upload_file():
 # Required for Render (port handling)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
+
+
+
 
