@@ -24,9 +24,8 @@ def upload_file():
     # Use row 5 as header
     df = pd.read_excel(file, header=4)
 
-    # Remove columns C, D, E, F, H, I
-    cols_to_remove = df.columns[[2, 3, 4, 5, 7, 8]]
-    df = df.drop(columns=cols_to_remove, errors='ignore')
+    # Remove columns
+    df = df.drop(columns=["   Department Name   ", "   Convertion Name   ","   Scale 1   ","   Operator   ","   Scale 2   ","   Low Stock   "], errors='ignore')
 
     # Add new columns
     df["benar"] = ""
