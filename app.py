@@ -69,8 +69,8 @@ def upload_file():
 
 
         # Add new columns
-        df["benar"] = ""
-        df["real value"] = ""
+        #df["benar"] = ""
+        #df["real value"] = ""
 
         # fit output
         output = BytesIO()
