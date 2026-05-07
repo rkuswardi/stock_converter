@@ -62,19 +62,21 @@ def upload_file():
         # fit output
         output = BytesIO()
 
-        # write workbook directly
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        # create excel writer
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             df.to_excel(writer, index=False, sheet_name='Sheet1')
 
             workbook = writer.book
             worksheet = writer.sheets['Sheet1']
 
             # auto-fit columns
-            for column_cells in worksheet.columns:
-                length = max(len(str(cell.value)) if cell.value else 0 for cell in column_cells)
-                column_letter = get_column_letter(column_cells[0].column)
+            for i, col in enumerate(df.columns):
+                max_len = max(
+                    df[col].astype(str).map(len).max(),
+                    len(str(col))
+                ) + 2
 
-                worksheet.column_dimensions[column_letter].width = min(length + 2, 50)
+                worksheet.set_column(i, i, min(max_len, 50))
 
         output.seek(0)
 
