@@ -23,8 +23,21 @@ def upload_file():
     try:
         file = request.files['file']
 
+
+        filename = file.filename.lower()
+
+        # choose engine based on extension
+        if filename.endswith('.xlsx'):
+            engine = 'openpyxl'
+
+        elif filename.endswith('.xls'):
+            engine = 'xlrd'
+
+        else:
+            return "Please upload .xls or .xlsx file", 400
+        
         # Row 5 is header
-        df = pd.read_excel(file, header=4)
+        df = pd.read_excel(file, engine=engine, header=4)
 
         df.columns = (
             df.columns
