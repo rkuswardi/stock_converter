@@ -61,35 +61,28 @@ def upload_file():
 
         # fit output
         output = BytesIO()
-        df.to_excel(output, index=False)
 
-        # reopen workbook to adjust column width
+        # write workbook directly
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Sheet1')
+
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
+
+            # auto-fit columns
+            for column_cells in worksheet.columns:
+                length = max(len(str(cell.value)) if cell.value else 0 for cell in column_cells)
+                column_letter = get_column_letter(column_cells[0].column)
+
+                worksheet.column_dimensions[column_letter].width = min(length + 2, 50)
+
         output.seek(0)
-        from openpyxl import load_workbook
 
-        wb = load_workbook(output)
-        ws = wb.active
-
-        # auto-fit columns
-        for col in ws.columns:
-            max_length = 0
-            col_letter = get_column_letter(col[0].column)
-
-            for cell in col:
-                try:
-                    if cell.value:
-                        max_length = max(max_length, len(str(cell.value)))
-                except:
-                    pass
-
-            ws.column_dimensions[col_letter].width = max_length + 2
-
-        final_output = BytesIO()
-        wb.save(final_output)
-        final_output.seek(0)
-
-
-        return send_file(final_output, download_name="output.xlsx", as_attachment=True)
+        return send_file(
+            output,
+            download_name="output.xlsx",
+            as_attachment=True
+        )
     
     except Exception as e:
         import traceback
